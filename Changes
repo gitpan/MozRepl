@@ -1,4 +1,8 @@
 Revision history for MozRepl
 
+0.02    2007/05/09 21:44
+        Remove help() method from MozRepl::Plugin::Base
+        Add correct pod to MozRepl::Plugin::Base
+
 0.01    2007/05/01 11:06
         First version.

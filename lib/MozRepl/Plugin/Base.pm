@@ -13,21 +13,58 @@ __PACKAGE__->mk_accessors($_) for (qw/template/);
 
 =head1 NAME
 
-MozRepl::Plugin::Base - The fantastic new MozRepl::Plugin::Base!
+MozRepl::Plugin::Base - Plugin base class.
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =cut
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 =head1 SYNOPSIS
 
+    package MozRepl::Plugin::Foo::Bar;
+
+    use strict;
+    use warnings;
+
+    use base qw(MozRepl::Plugin::Base);
+
+    sub execute {
+        my ($self, $ctx, $args) = @_;
+
+        $ctx->execute(q|window.alert("Anta ga taisho!")|);
+    }
+
+    1;
+
+    package main;
+
+    use MozRepl;
+
+    my $repl = MozRepl->new;
+    $repl->setup({ plugins => { plugins => [qw/Foo::Bar/] } });
+    $repl->foo_bar();
+
+=head1 DESCRIPTION
+
+This module is base class any plugins for MozRepl.
+
 =head1 METHODS
 
-=head2 new
+=head2 new($args)
+
+Create instance.
+
+=over 4
+
+=item $args
+
+Hash reference.
+
+=back
 
 =cut
 
@@ -47,7 +84,23 @@ sub new {
     return $self;
 }
 
-=head2 setup
+=head2 setup($ctx, @args)
+
+Called from L<MozRepl> setup() method.
+This is abstract method, If you want to task in setup pharse,
+then must be overriding this method.
+
+=over 4
+
+=item $ctx
+
+Context object. See L<MozRepl>
+
+=item @args
+
+Extra parameters.
+
+=back
 
 =cut
 
@@ -55,7 +108,22 @@ sub setup {
     my ($self, $ctx, @args) = @_;
 }
 
-=head2 execute
+=head2 execute($ctx, @args)
+
+Execute plugin method.
+Please override me.
+
+=over 4
+
+=item $ctx
+
+Context object. See L<MozRepl>
+
+=item @args
+
+Extra parameters.
+
+=back
 
 =cut
 
@@ -65,7 +133,13 @@ sub execute {
     croak('Please override this method');
 }
 
-=head2 method_name
+=head2 method_name()
+
+If you override this method and return constant string, 
+then the string will be used as method name in context.
+
+Not overriding method name will be determined by L<MozRepl::Util> plugin_to_method() method.
+See L<MozRepl::Util/plugin_to_method($plugin, $search)>
 
 =cut
 
@@ -73,18 +147,21 @@ sub method_name {
     return "";
 }
 
-=head2 help
+=head2 process($name, $vars)
 
-=cut
+Processing template using by L<Template>, L<Template::Provider::FromDATA>.
 
-sub help {
-    my ($self, $ctx, $variable) = @_;
-    my $help = '';
-    ### later
-    return $help;
-}
+=over 4
 
-=head2 process
+=item $name
+
+Label name in DATA Section.
+
+=item $vars
+
+Append values as hash reference.
+
+=back
 
 =cut
 
@@ -96,6 +173,18 @@ sub process {
     $self->template->process($name, $vars, \$output);
     return $output;
 }
+
+=head1 SEE ALSO
+
+=over 4
+
+=item L<MozRepl>
+
+=item L<Template>
+
+=item L<Template::Provider::FromDATA>
+
+=back
 
 =head1 AUTHOR
 
