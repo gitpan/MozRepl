@@ -22,11 +22,11 @@ MozRepl - Perl interface of MozRepl
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =cut
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 =head1 SYNOPSIS
 
@@ -50,6 +50,18 @@ This module is perl interface of MozRepl.
 
 Additionaly this is enable to extend by writing plugin module.
 You want to write plugin, see L<MozRepl::Plugin::Base> or other plugins.
+
+=head2 For cygwin users
+
+In cygwin, please add binmode param as 1 in client args.
+
+    $repl->setup({
+        client => {
+            extra_client_args => {
+                binmode => 1
+            }
+        }
+    });
 
 =head1 METHODS
 

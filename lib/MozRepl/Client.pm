@@ -7,7 +7,7 @@ use base qw(Class::Accessor::Fast);
 
 __PACKAGE__->mk_accessors(qw/telnet connect_args extra_telnet_args/);
 
-use Carp qw(croak);
+use Carp::Clan qw(croak);
 use Data::Dump qw(dump);
 use Net::Telnet;
 use Text::SimpleTable;
@@ -18,11 +18,11 @@ MozRepl::Client - MozRepl client class using telnet.
 
 =head1 VERSION
 
-version 0.01
+version 0.03
 
 =cut
 
-our $VERSION = '0.01';
+our $VERSION = '0.03';
 
 =head1 METHODS
 
@@ -71,6 +71,8 @@ sub new {
     $args->{port} ||= $ENV{MOZREPL_PORT} || 4242;
     $args->{timeout} ||= $ENV{MOZREPL_TIMEOUT} || 10;
     $args->{extra_client_args} ||= {};
+
+    $args->{extra_client_args}->{binmode} = 1 if ($^O eq "cygwin");
 
     if ($ctx->log->is_debug) {
         my $table = Text::SimpleTable->new([20, 'client_arg_name'], [40, 'client_arg_value']);
@@ -178,8 +180,10 @@ Command string.
 sub execute {
     my ($self, $ctx, $command) = @_;
 
-    ### trigger & logging
-    my $message = [map { chomp; $_ } $self->telnet->cmd($command)];
+    ### adhoc
+    $command = join(" ", split(/\n/, $command)) if ($^O eq "cygwin");
+
+    my $message = [map { chomp; $_ } $self->telnet->cmd(String => $command)];
 
     if ($ctx->log->is_debug) {
         my $table = Text::SimpleTable->new([10, 'type'], [40, 'content']);

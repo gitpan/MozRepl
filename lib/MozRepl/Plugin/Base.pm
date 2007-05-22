@@ -5,7 +5,7 @@ use warnings;
 
 use base qw(Class::Accessor::Fast);
 
-use Carp qw(croak);
+use Carp::Clan qw(croak);
 use Template;
 use Template::Provider::FromDATA;
 
@@ -17,11 +17,11 @@ MozRepl::Plugin::Base - Plugin base class.
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =cut
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 =head1 SYNOPSIS
 
