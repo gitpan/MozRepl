@@ -13,11 +13,11 @@ MozRepl::Plugin::JSON - To JSON string plugin.
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =cut
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 =head1 SYNOPSYS
 
@@ -32,20 +32,17 @@ our $VERSION = '0.03';
 
 Add json() method to L<MozRepl>.
 
+=head2 EXPERIMENTAL
+
+json.org's json.js is not running under cygwin.
+So I decided to change implements future.
+Therefore this module will be change.
+
 =head1 METHODS
 
 =head2 setup($ctx, $args)
 
-Load script at http://json.org/json.js
-So extending build in object.
-
-    Array.prototype.toJSONString()
-    Boolean.prototype.toJSONString()
-    Data.prototype.toJSONString()
-    Number.prototype.toJSONString()
-    Object.prototype.toJSONString()
-    String.prototype.toJSONString()
-    String.prototype.parseJSON(filter)
+Load script at http://www.thomasfrank.se/downloadableJS/jsonStringify.js
 
 =cut
 
@@ -83,8 +80,6 @@ See L<MozRepl::Util/javascript_value($value)>.
 sub execute {
     my ($self, $ctx, $args) = @_;
 
-    # croak("Temporary json not support on this OS : " . $^O) if ($^O eq "cygwin");
-
     my $cmd = $self->process('execute', { repl => $ctx->repl, source => $args->{source} });
     my @result = $ctx->execute($cmd);
 
@@ -94,8 +89,16 @@ sub execute {
         croak($result[$#result - 1]);
     }
 
-    return join("\n", @result);
+    return join("", @result);
 }
+
+=head1 KNOW ISSUE
+
+=over 4
+
+=item This module is not running under cygwin. (maybe MSWin32 too?)
+
+=back
 
 =head1 SEE ALSO
 
@@ -107,7 +110,9 @@ sub execute {
 
 =item L<Data::JavaScript::Anon>
 
-=item http://json.org/json.js
+=item L<JavaScript::Minifier>
+
+=item http://www.thomasfrank.se/downloadableJS/jsonStringify.js
 
 =back
 
@@ -134,33 +139,16 @@ under the same terms as Perl itself.
 1; # End of MozRepl::Plugin::JSON
 
 __DATA__
-__setup__
-if(!Object.prototype.toJSONString){Array.prototype.toJSONString=function(){var a=['['],b,i,l=this.length,v;function
-p(s){if(b){a.push(',');}
-a.push(s);b=true;}
-for(i=0;i<l;i+=1){v=this[i];switch(typeof v){case'object':if(v){if(typeof v.toJSONString==='function'){p(v.toJSONString());}}else{p("null");}
-break;case'string':case'number':case'boolean':p(v.toJSONString());}}
-a.push(']');return a.join('');};Boolean.prototype.toJSONString=function(){return String(this);};Date.prototype.toJSONString=function(){function f(n){return n<10?'0'+n:n;}
-return'"'+this.getFullYear()+'-'+
-f(this.getMonth()+1)+'-'+
-f(this.getDate())+'T'+
-f(this.getHours())+':'+
-f(this.getMinutes())+':'+
-f(this.getSeconds())+'"';};Number.prototype.toJSONString=function(){return isFinite(this)?String(this):"null";};Object.prototype.toJSONString=function(){var a=['{'],b,k,v;function p(s){if(b){a.push(',');}
-a.push(k.toJSONString(),':',s);b=true;}
-for(k in this){if(this.hasOwnProperty(k)){v=this[k];switch(typeof v){case'object':if(v){if(typeof v.toJSONString==='function'){p(v.toJSONString());}}else{p("null");}
-break;case'string':case'number':case'boolean':p(v.toJSONString());}}}
-a.push('}');return a.join('');};(function(s){var m={'\b':'\\b','\t':'\\t','\n':'\\n','\f':'\\f','\r':'\\r','"':'\\"','\\':'\\\\'};s.parseJSON=function(filter){var j;function walk(k,v){var i;if(v&&typeof v==='object'){for(i in v){if(v.hasOwnProperty(i)){v[i]=walk(i,v[i]);}}}
-return filter(k,v);}
-if(/^("(\\.|[^"\\\n\r])*?"|[,:{}\[\]0-9.\-+Eaeflnr-u \n\r\t])+?$/.test(this)){try{j=eval('('+this+')');}catch(e){throw new SyntaxError("parseJSON");}}else{throw new SyntaxError("parseJSON");}
-if(typeof filter==='function'){j=walk('',j);}
-return j;};s.toJSONString=function(){if(/["\\\x00-\x1f]/.test(this)){return'"'+this.replace(/([\x00-\x1f\\"])/g,function(a,b){var c=m[b];if(c){return c;}
-c=b.charCodeAt();return'\\u00'+
-Math.floor(c/16).toString(16)+
-(c%16).toString(16);})+'"';}
-return'"'+this+'"';};})(String.prototype);}
 __execute__
-(function(variable) {
-  return variable.toJSONString();
-})([% source %]);
+JSONstring.make([% source %]);
+__setup__
+JSONstring={compactOutput:false,includeProtos:false,includeFunctions:false,detectCirculars:true,restoreCirculars:true,make:function(arg,restore){this.restore=restore;this.mem=[];this.pathMem=[];return this.toJsonStringArray(arg).join('');},toObject:function(x){eval("this.myObj="+x);if(!this.restoreCirculars||!alert){return this.myObj};this.restoreCode=[];this.make(this.myObj,true);var r=this.restoreCode.join(";")+";";eval('r=r.replace(/\\W([0-9]{1,})(\\W)/g,"[$1]$2").replace(/\\.\\;/g,";")');eval(r);return this.myObj},toJsonStringArray:function(arg,out){if(!out){this.path=[]};out=out||[];var u;switch(typeof arg){case'object':this.lastObj=arg;if(this.detectCirculars){var m=this.mem;var n=this.pathMem;for(var i=0;i<m.length;i++){if(arg===m[i]){out.push('"JSONcircRef:'+n[i]+'"');return out}};m.push(arg);n.push(this.path.join("."));};if(arg){if(arg.constructor==Array){out.push('[');for(var i=0;i<arg.length;++i){this.path.push(i);if(i>0)
+out.push(',\n');this.toJsonStringArray(arg[i],out);this.path.pop();}
+out.push(']');return out;}else if(typeof arg.toString!='undefined'){out.push('{');var first=true;for(var i in arg){if(!this.includeProtos&&arg[i]===arg.constructor.prototype[i]){continue};this.path.push(i);var curr=out.length;if(!first)
+out.push(this.compactOutput?',':',\n');this.toJsonStringArray(i,out);out.push(':');this.toJsonStringArray(arg[i],out);if(out[out.length-1]==u)
+out.splice(curr,out.length-curr);else
+first=false;this.path.pop();}
+out.push('}');return out;}
+return out;}
+out.push('null');return out;case'unknown':case'undefined':case'function':out.push(this.includeFunctions?arg:u);return out;case'string':if(this.restore&&arg.indexOf("JSONcircRef:")==0){this.restoreCode.push('this.myObj.'+this.path.join(".")+"="+arg.split("JSONcircRef:").join("this.myObj."));};out.push('"');var a=['\n','\\n','\r','\\r','"','\\"'];arg+="";for(var i=0;i<6;i+=2){arg=arg.split(a[i]).join(a[i+1])};out.push(arg);out.push('"');return out;default:out.push(String(arg));return out;}}}
 __END__
