@@ -22,11 +22,11 @@ MozRepl - Perl interface of MozRepl
 
 =head1 VERSION
 
-version 0.04
+version 0.05
 
 =cut
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 =head1 SYNOPSIS
 
@@ -247,7 +247,7 @@ sub setup_plugin {
 
     my $method = MozRepl::Util->plugin_to_method($plugin, $self->search);
 
-    {
+    unless ($self->can($method)) {
         no strict 'refs';
 
         $self->log->debug('define method : ' . $method);

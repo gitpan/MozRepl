@@ -73,7 +73,6 @@ sub new {
     $args->{extra_client_args} ||= {};
 
     $args->{extra_client_args}->{binmode} = 1 if ($^O eq "cygwin");
-    # $args->{extra_client_args}->{ors} = "\x0D\x0A" if ($^O eq "cygwin");
 
     if ($ctx->log->is_debug) {
         my $table = Text::SimpleTable->new([20, 'client_arg_name'], [40, 'client_arg_value']);

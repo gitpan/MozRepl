@@ -32,12 +32,6 @@ our $VERSION = '0.04';
 
 Add json() method to L<MozRepl>.
 
-=head2 EXPERIMENTAL
-
-json.org's json.js is not running under cygwin.
-So I decided to change implements future.
-Therefore this module will be change.
-
 =head1 METHODS
 
 =head2 setup($ctx, $args)
@@ -91,14 +85,6 @@ sub execute {
 
     return join("", @result);
 }
-
-=head1 KNOW ISSUE
-
-=over 4
-
-=item This module is not running under cygwin. (maybe MSWin32 too?)
-
-=back
 
 =head1 SEE ALSO
 
