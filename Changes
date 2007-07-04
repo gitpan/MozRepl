@@ -1,5 +1,9 @@
 Revision history for MozRepl
 
+0.06    2007/07/04 15:26
+        * Fixed setup_log() process in MozRepl.pm
+          Available using instanciate log class.
+
 0.05    2007/07/02 12:53
         * Skip defined plugin method
 

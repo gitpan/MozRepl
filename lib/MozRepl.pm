@@ -22,11 +22,11 @@ MozRepl - Perl interface of MozRepl
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =cut
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 =head1 SYNOPSIS
 
@@ -173,6 +173,16 @@ If you want to limit log levels, specify levels like below.
 
 See L<MozRepl::Log/new($args)>.
 
+
+If you want to use another log class, and already instanciate it, 
+then you should call and set the instance before setup() method process.
+
+Example,
+
+    my $repl = MozRepl->new;
+    $repl->log($another_log_instance);
+    $repl->setup($config);
+
 =cut
 
 sub setup_log {
@@ -180,12 +190,18 @@ sub setup_log {
 
     $args ||= [qw/debug info warn error fatal/];
 
-    $self->log_class->use;
-    $self->log($self->log_class->new(@$args));
+    ### skip already exists log instance
+    unless ($self->log) {
+        $self->log_class->use;
+        $self->log($self->log_class->new(@$args));
+    }
+    else {
+        $self->log_class(ref $self->log);
+    }
 
     return unless ($self->log->is_debug);
 
-    $self->log->debug('Logging enabled');
+    $self->log->debug('MozRepl logging enabled');
 }
 
 =head2 setup_client($args)
